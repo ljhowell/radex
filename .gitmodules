@@ -1,0 +1,3 @@
+[submodule "negex"]
+	path = negex
+	url = https://github.com/ljhowell/negex/
