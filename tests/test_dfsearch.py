@@ -733,7 +733,9 @@ class TestLogicalStatement(unittest.TestCase):
     def test_all(self):
         """Test searches with wildcards, boolean operators and proximity operators"""
         print("\n")
-        for testnumber, test in enumerate(self.ls_test_boolean_wildcard_proximity_search):
+        for testnumber, test in enumerate(
+            self.ls_test_boolean_wildcard_proximity_search
+        ):
             candidate = test["candidate"]
             expression = test["expression"]
             expected_result = test["result"]

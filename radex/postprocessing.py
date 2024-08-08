@@ -48,7 +48,9 @@ def extract_regex_matches_all(df, cols):
     # Get text matches from all cols and combine into a new column
     df_tmp = pd.DataFrame()
     for col in cols:
-        df_tmp[col + "_text"] = df[col].apply(extract_regex_matches_single_entry)
+        df_tmp[col + "_text"] = df[col].apply(
+            extract_regex_matches_single_entry
+        )
 
     # Combine all text matches into a single column
     df["all_text"] = df_tmp.astype(str).agg(",".join, axis=1)
@@ -73,7 +75,13 @@ def highlight_text(text, matches, colour="#0000FF"):
     """
 
     matches_text = list(
-        set([matches[key][1][0][0] for key in matches.keys() if matches[key][0] is True])
+        set(
+            [
+                matches[key][1][0][0]
+                for key in matches.keys()
+                if matches[key][0] is True
+            ]
+        )
     )
     for match in matches_text:
         text = re.sub(
@@ -109,13 +117,18 @@ def highlight_table(df, cmap=None):
                 cols.append(col)
 
     if cmap is None:
-        cmap = {col: rgb2hex(color) for col, color in zip(cols, plt.cm.get_cmap("tab20").colors)}
+        cmap = {
+            col: rgb2hex(color)
+            for col, color in zip(cols, plt.cm.get_cmap("tab20").colors)
+        }
     elif isinstance(cmap, list):
         cmap = {col: rgb2hex(color) for col, color in zip(cols, cmap)}
 
     for col in cols:
         df["report_highlighted"] = df.apply(
-            lambda x, col=col: highlight_text(x["report_highlighted"], x[col], colour=cmap[col]),
+            lambda x, col=col: highlight_text(
+                x["report_highlighted"], x[col], colour=cmap[col]
+            ),
             axis=1,
         )
 

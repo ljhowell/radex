@@ -5,7 +5,14 @@ into a nested list of logical expressions and operators.
 
 import re
 
-from pyparsing import Word, ZeroOrMore, alphanums, infixNotation, oneOf, opAssoc
+from pyparsing import (
+    Word,
+    ZeroOrMore,
+    alphanums,
+    infixNotation,
+    oneOf,
+    opAssoc,
+)
 
 
 class Expression:
@@ -45,7 +52,11 @@ class Expression:
 
         expr = infixNotation(
             self.statement
-            | "(" + ZeroOrMore(self.not_) + self.statement + ZeroOrMore(self.and_ | self.or_) + ")"
+            | "("
+            + ZeroOrMore(self.not_)
+            + self.statement
+            + ZeroOrMore(self.and_ | self.or_)
+            + ")"
             | ZeroOrMore(self.not_) + "(" + self.statement + ")",
             [
                 (self.not_, 1, opAssoc.RIGHT),
@@ -108,7 +119,19 @@ class Expression:
                     of opening and closing parentheses, False otherwise.
         """
         valid_chars = set(
-            "_" + alphanums + "~" + "*" + "?" + " " + "|" + "&" + "^" + "¬" + "!" + "(" + ")"
+            "_"
+            + alphanums
+            + "~"
+            + "*"
+            + "?"
+            + " "
+            + "|"
+            + "&"
+            + "^"
+            + "¬"
+            + "!"
+            + "("
+            + ")"
         )
         num_open_parentheses = input_str.count("(")
         num_close_parentheses = input_str.count(")")

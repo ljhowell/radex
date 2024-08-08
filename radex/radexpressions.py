@@ -18,11 +18,14 @@ def evaluate_regex(candidate: str, regex: str) -> list:
         list: A list of tuples. Each tuple contains the matched substring and start/ end indices.
     """
     # Split candidate into sentences which are searched individually
-    candidates = [sentence for sentence in candidate.split(".") if sentence.strip() != ""]
+    candidates = [
+        sentence for sentence in candidate.split(".") if sentence.strip() != ""
+    ]
     result = []
     for c in candidates:
         result += [
-            (match.group(), match.start(), match.end()) for match in re.finditer(regex, c.strip())
+            (match.group(), match.start(), match.end())
+            for match in re.finditer(regex, c.strip())
         ]
 
     return result
@@ -43,8 +46,12 @@ def get_regex_wildcards(expression: str) -> str:
         str: The regex pattern
     """
     regex = re.escape(expression.strip())
-    regex = regex.replace(r"\*", r"\w*")  # replace * with multiple character wildcard
-    regex = regex.replace(r"\?", r".?")  # replace ? with single character wildcard
+    regex = regex.replace(
+        r"\*", r"\w*"
+    )  # replace * with multiple character wildcard
+    regex = regex.replace(
+        r"\?", r".?"
+    )  # replace ? with single character wildcard
     regex = regex.replace(r"_", r"\b")  # replace _ with word boundary
 
     # add word boundary to start and end of regex
@@ -129,7 +136,9 @@ def string_search(candidate: str, expression: str, return_bool: bool = False):
 
     # Proximity search
     if "~" in expression:
-        parts = re.split(r"(~{1,2}\d+)", expression)  # split on proximity string e.g. '~2' or '~~2'
+        parts = re.split(
+            r"(~{1,2}\d+)", expression
+        )  # split on proximity string e.g. '~2' or '~~2'
 
         if len(parts) == 3:
             word1 = parts[0].strip()
@@ -139,7 +148,9 @@ def string_search(candidate: str, expression: str, return_bool: bool = False):
             try:
                 max_distance = int(parts[1].replace("~", ""))
             except ValueError:
-                print(f"Invalid max distance in proximity search: {expression}")
+                print(
+                    f"Invalid max distance in proximity search: {expression}"
+                )
 
             # Decide whether to do a center search or right search
             if parts[1].count("~") == 2:
@@ -147,7 +158,9 @@ def string_search(candidate: str, expression: str, return_bool: bool = False):
             else:
                 direction = "right"
 
-            regex = get_regex_proximity(word1, word2, max_distance, direction=direction)
+            regex = get_regex_proximity(
+                word1, word2, max_distance, direction=direction
+            )
 
         else:
             raise ValueError(f"Invalid proximity search: {expression}")
@@ -174,10 +187,17 @@ def wildcard_search(string, pattern):
         list: A list of tuples, where each tuple contains matches and start/ end indices.
     """
     regex = re.escape(pattern)
-    regex = regex.replace(r"\*", r"\w*")  # replace * with multiple character wildcard
-    regex = regex.replace(r"\?", r".?")  # replace ? with single character wildcard
+    regex = regex.replace(
+        r"\*", r"\w*"
+    )  # replace * with multiple character wildcard
+    regex = regex.replace(
+        r"\?", r".?"
+    )  # replace ? with single character wildcard
     regex = regex.replace(r"_", r"\b")  # replace _ with word boundary
 
-    matches = [(match.group(), match.start(), match.end()) for match in re.finditer(regex, string)]
+    matches = [
+        (match.group(), match.start(), match.end())
+        for match in re.finditer(regex, string)
+    ]
 
     return matches

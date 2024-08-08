@@ -41,7 +41,7 @@ def clean_dataframe(
     """
     if isinstance(text_columns, str):
         text_columns = [text_columns]
-    
+
     for col in text_columns:
 
         if drop_duplicates:
@@ -49,12 +49,24 @@ def clean_dataframe(
         if drop_nulls:
             df_data = df_data.dropna(subset=[col])  # drop nulls
 
-        df_data[col] = df_data[col].str.replace("\n", " ", regex=True)  # remove new line characters
-        df_data[col] = df_data[col].str.replace("/", " ", regex=True)  # remove forward slash
-        df_data[col] = df_data[col].str.replace("-", " ", regex=True)  # remove dash
-        df_data[col] = df_data[col].str.replace(r"[^\w\s.]", "", regex=True)  # remove punctuation
-        df_data[col] = df_data[col].str.replace(r"\s+", " ", regex=True)  # remove whitespace
-        df_data[col] = df_data[col].str.replace(r"\.$", "", regex=True)  # remove trailing period
+        df_data[col] = df_data[col].str.replace(
+            "\n", " ", regex=True
+        )  # remove new line characters
+        df_data[col] = df_data[col].str.replace(
+            "/", " ", regex=True
+        )  # remove forward slash
+        df_data[col] = df_data[col].str.replace(
+            "-", " ", regex=True
+        )  # remove dash
+        df_data[col] = df_data[col].str.replace(
+            r"[^\w\s.]", "", regex=True
+        )  # remove punctuation
+        df_data[col] = df_data[col].str.replace(
+            r"\s+", " ", regex=True
+        )  # remove whitespace
+        df_data[col] = df_data[col].str.replace(
+            r"\.$", "", regex=True
+        )  # remove trailing period
         df_data[col] = df_data[col].str.lower()  # Convert to lowercase
 
         if drop_negatives:
@@ -71,7 +83,10 @@ def clean_dataframe(
 
     return df_data
 
-def remove_stopwords_str(text: str, stop_words: Optional[set[str]] = None) -> str:
+
+def remove_stopwords_str(
+    text: str, stop_words: Optional[set[str]] = None
+) -> str:
     """Remove stopwords from a string.
 
     Args:
@@ -83,14 +98,25 @@ def remove_stopwords_str(text: str, stop_words: Optional[set[str]] = None) -> st
     """
     # Load stopwords from csv]
     if stop_words is None:
-        ls_stop_words = pd.read_csv('radex/stopwords.csv').T.values[0]
-        exceptions = ["no", "not", "nor", "few", "other"] # don't remove these words 
-        ls_stop_words = [word for word in ls_stop_words if word not in exceptions]
+        ls_stop_words = pd.read_csv("radex/stopwords.csv").T.values[0]
+        exceptions = [
+            "no",
+            "not",
+            "nor",
+            "few",
+            "other",
+        ]  # don't remove these words
+        ls_stop_words = [
+            word for word in ls_stop_words if word not in exceptions
+        ]
         stop_words = set(ls_stop_words)
- 
-    stop_words = set(re.sub(r"[^\w\s]", "", s) for s in stop_words)  # remove punctuation
+
+    stop_words = set(
+        re.sub(r"[^\w\s]", "", s) for s in stop_words
+    )  # remove punctuation
     text = re.sub(r"\b(" + r"|".join(stop_words) + r")\b\s*", "", text)
     return text
+
 
 def remove_stopwords(
     df: pd.DataFrame,
@@ -111,18 +137,32 @@ def remove_stopwords(
 
     # Load stopwords from csv]
     if stop_words is None:
-        ls_stop_words = pd.read_csv('radex/stopwords.csv').T.values[0]
-        exceptions = ["no", "not", "nor", "few", "other"] # don't remove these words 
-        ls_stop_words = [word for word in ls_stop_words if word not in exceptions]
+        ls_stop_words = pd.read_csv("radex/stopwords.csv").T.values[0]
+        exceptions = [
+            "no",
+            "not",
+            "nor",
+            "few",
+            "other",
+        ]  # don't remove these words
+        ls_stop_words = [
+            word for word in ls_stop_words if word not in exceptions
+        ]
         stop_words = set(ls_stop_words)
-    
-    stop_words = set(re.sub(r"[^\w\s]", "", s) for s in stop_words)  # remove punctuation
+
+    stop_words = set(
+        re.sub(r"[^\w\s]", "", s) for s in stop_words
+    )  # remove punctuation
 
     if isinstance(text_columns, str):
         text_columns = [text_columns]
 
-    for col in text_columns:  # Remove stopwords from text in each column using regex
-        df[col] = df[col].apply(lambda x: re.sub(r"\b(" + r"|".join(stop_words) + r")\b\s*", "", x))
+    for (
+        col
+    ) in text_columns:  # Remove stopwords from text in each column using regex
+        df[col] = df[col].apply(
+            lambda x: re.sub(r"\b(" + r"|".join(stop_words) + r")\b\s*", "", x)
+        )
 
     return df
 
@@ -182,20 +222,22 @@ def remove_negated_phrases(
     """
 
     if rules_file is None:
-        rules_file = r'negex/negexPython/negex_triggers.txt'
+        rules_file = r"negex/negexPython/negex_triggers.txt"
 
     with open(rules_file, encoding="utf-8") as rfile:
         rules = sortRules(rfile.readlines())
 
     output = ""
     for sentence in text.split("."):
-        tagger = negTagger(sentence=sentence, phrases=[], rules=rules, negP=drop_ambiguous)
+        tagger = negTagger(
+            sentence=sentence, phrases=[], rules=rules, negP=drop_ambiguous
+        )
         negated_phrases = tagger.getScopes()
         tagged_sentence = tagger.getNegTaggedSentence()
 
         if verbose:
             print(tagged_sentence, text)
-            
+
         # remove negated phrases
         for phrase in negated_phrases:
             text = text.replace(phrase, "XXXXX")
@@ -203,7 +245,7 @@ def remove_negated_phrases(
         # Remove words between any tags
         if replace_tagged:
             text = re.sub(r"\[.*?\].*?\[.*?\]", "", tagged_sentence)
-        
+
         output += text + ". "
 
     # Clean up text

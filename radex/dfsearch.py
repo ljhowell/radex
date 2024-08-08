@@ -72,7 +72,9 @@ def check_all_matches(
 
     # Flatten the expression
     expression = flatten_list(expression)
-    expression = [i for i in expression if i not in ["&", "|", "¬", "(", ")"]]  # Remove operators
+    expression = [
+        i for i in expression if i not in ["&", "|", "¬", "(", ")"]
+    ]  # Remove operators
 
     return {
         part.strip(): string_search(candidate, part.strip(), return_bool=False)
@@ -140,19 +142,32 @@ def evaluate_logical_statement(
             "v",
             "!",
         ]:  # Replace symbols with python operators
-            expression = expression.replace("&", "and").replace("|", "or").replace("¬", "not")
-            expression = expression.replace("^", "and").replace("v", "or").replace("!", "not")
+            expression = (
+                expression.replace("&", "and")
+                .replace("|", "or")
+                .replace("¬", "not")
+            )
+            expression = (
+                expression.replace("^", "and")
+                .replace("v", "or")
+                .replace("!", "not")
+            )
             return expression
         else:  # Assume expression is statement to be evaluated
             result = string_search(candidate, expression.strip())
             if verbose:
                 print(list_to_string(expression), "=>", result[0], result[1])
-            return string_search(candidate, expression.strip(), return_bool=True)
+            return string_search(
+                candidate, expression.strip(), return_bool=True
+            )
 
     if isinstance(expression, list):  # Evaluate sub-statements recursively
-        expression = [i for i in expression if i not in ["(", ")"]]  # Remove excess brackets
+        expression = [
+            i for i in expression if i not in ["(", ")"]
+        ]  # Remove excess brackets
         sub_results = [
-            evaluate_logical_statement(candidate, sub, verbose=verbose) for sub in expression
+            evaluate_logical_statement(candidate, sub, verbose=verbose)
+            for sub in expression
         ]
 
         # Evaluate subexpression
@@ -204,7 +219,9 @@ def search_dataframe(
         new_column_name = column + "_matches"
 
     # Filter a column based on a logical expression
-    df[new_column_name] = df[column].map(lambda x: func(x, expression=expression, verbose=False))
+    df[new_column_name] = df[column].map(
+        lambda x: func(x, expression=expression, verbose=False)
+    )
 
     if debug_column:
         df[new_column_name + "_matches"] = df[column].map(
