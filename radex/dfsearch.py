@@ -43,9 +43,9 @@ def list_to_string(input_list: Union[list, str]) -> str:
         str: The converted string.
     """
     if isinstance(input_list, list):
-        return "(" + " ".join([list_to_string(x) for x in input_list]) + ")"
+        return "(" + ", ".join([list_to_string(x) for x in input_list]) + ")"
     else:
-        return input_list.strip()
+        return str(input_list).strip()
 
 
 def check_all_matches(
@@ -110,7 +110,7 @@ def evaluate_logical_statement(
     candidate: str,
     expression: Union[list, str],
     verbose: Optional[bool] = False,
-) -> Union[bool, str]:
+) -> Union[str, bool]:
     """
     The main point of input to evaluate a logical statement.
 
@@ -158,7 +158,9 @@ def evaluate_logical_statement(
             if verbose:
                 print(list_to_string(expression), "=>", result[0], result[1])
             return string_search(
-                candidate, expression.strip(), return_bool=True
+                candidate, 
+                expression.strip(), 
+                return_bool=True
             )
 
     if isinstance(expression, list):  # Evaluate sub-statements recursively
