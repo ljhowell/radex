@@ -130,3 +130,9 @@ dmypy.json
 
 # templates
 .github/templates/*
+
+# nobakcup
+nobackup/
+
+# vscode
+.vscode/
