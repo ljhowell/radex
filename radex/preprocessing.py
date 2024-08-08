@@ -214,7 +214,7 @@ def remove_negated_phrases(
         text (str): The input text from which negated phrases will be removed.
         rules_file (str, optional): Path to negation rules.
         drop_ambiguous (bool, optional): Whether to drop ambiguous phrases. Defaults to False.
-        replace_tagged (bool, optional): Replace words that are a tag with a full stop. Defaults to False.
+        replace_tagged (bool, optional): Replace tagged words with XXXXX. Defaults to False.
         verbose (bool, optional): Whether to print the tagged sentence. Defaults to False.
 
     Returns:
