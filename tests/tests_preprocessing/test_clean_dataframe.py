@@ -99,4 +99,3 @@ def test_merge_columns(_sample_dataframe):
                                             np.nan,
                                             'Hello World! 5'
                                            ]
-    

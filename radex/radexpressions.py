@@ -4,7 +4,7 @@ Evaluate regular expressions.
 """
 
 import re
-from typing import Set, Union, List
+
 
 def evaluate_regex(candidate: str, regex: str) -> list:
     """
@@ -105,9 +105,10 @@ def get_regex_proximity(
     return regex
 
 
-def string_search(candidate: str,
-                  expression: str,
-                  ) -> tuple:
+def string_search(
+    candidate: str,
+    expression: str,
+) -> tuple:
     """
     Evaluates a logical expression containing wildcards */?/_ or proximity matching ~X.
     e.g.

@@ -4,9 +4,9 @@ Includes functions to clean text, remove stopwords, and combine columns.
 """
 
 import re
-from typing import List, Union  
+from typing import List, Union
 
-import pandas as pd 
+import pandas as pd
 
 from negex.negexPython.negex import negTagger
 
@@ -33,10 +33,10 @@ def clean_dataframe(
     Returns:
         pd.DataFrame: The cleaned dataframe.
     """
-    drop_duplicates = kwargs.get('drop_duplicates', False)
-    drop_nulls = kwargs.get('drop_nulls', False)
-    drop_negatives = kwargs.get('drop_negatives', None)
-    drop_stopwords = kwargs.get('drop_stopwords', None)
+    drop_duplicates = kwargs.get("drop_duplicates", False)
+    drop_nulls = kwargs.get("drop_nulls", False)
+    drop_negatives = kwargs.get("drop_negatives", None)
+    drop_stopwords = kwargs.get("drop_stopwords", None)
 
     if isinstance(text_columns, str):
         text_columns = [text_columns]
@@ -49,32 +49,19 @@ def clean_dataframe(
             df_data = df_data.dropna(subset=[col])  # drop nulls
 
         # remove new line characters
-        df_data[col] = df_data[col].str.replace(
-            "\n", " ", regex=True
-        )  
+        df_data[col] = df_data[col].str.replace("\n", " ", regex=True)
         # remove forward slash
-        df_data[col] = df_data[col].str.replace(
-            "/", " ", regex=True
-        )  
+        df_data[col] = df_data[col].str.replace("/", " ", regex=True)
         # remove dash
-        df_data[col] = df_data[col].str.replace(
-            "-", " ", regex=True
-        )  
+        df_data[col] = df_data[col].str.replace("-", " ", regex=True)
         # remove punctuation
-        df_data[col] = df_data[col].str.replace(
-            r"[^\w\s.]", "", regex=True
-        )  
+        df_data[col] = df_data[col].str.replace(r"[^\w\s.]", "", regex=True)
         # remove extra whitespace
-        df_data[col] = df_data[col].str.replace(
-            r"\s+", " ", regex=True
-        )  
+        df_data[col] = df_data[col].str.replace(r"\s+", " ", regex=True)
         # remove trailing period
-        df_data[col] = df_data[col].str.replace(
-            r"\.$", "", regex=True
-        )  
+        df_data[col] = df_data[col].str.replace(r"\.$", "", regex=True)
         # Convert to lowercase
-        df_data[col] = df_data[col].str.lower()  
-        
+        df_data[col] = df_data[col].str.lower()
 
         if drop_negatives:
             df_data[col] = df_data[col].apply(
@@ -83,7 +70,7 @@ def clean_dataframe(
                     rules=drop_negatives,
                 )
             )
-            
+
         if drop_stopwords:
             df_data[col] = df_data[col].apply(
                 lambda x: remove_stopwords(
@@ -94,8 +81,9 @@ def clean_dataframe(
 
         # Remove extra whitespace
         df_data[col] = df_data[col].str.strip()
-        
+
     return df_data
+
 
 def remove_stopwords(
     text: str,
@@ -106,16 +94,14 @@ def remove_stopwords(
 
     Args:
         df (str): Data to remove stopwords from.
-        stopwords (list[str]): List of stopwords. 
-        
+        stopwords (list[str]): List of stopwords.
+
     Returns:
         str: The text with stopwords removed.
     """
     # remove punctuation from stopwords
-    stopwords = list(
-        re.sub(r"[^\w\s]", "", s) for s in stopwords
-    )  
-      
+    stopwords = list(re.sub(r"[^\w\s]", "", s) for s in stopwords)
+
     data = re.sub(r"\b(" + r"|".join(stopwords) + r")\b\s*", "", text)
     return data
 
@@ -164,7 +150,7 @@ def remove_negated_phrases(
     Returns:
         str: The text with negated phrases removed.
     """
-    
+
     # if rules_file is None:
     #     rules_file = r"negex/negexPython/negex_triggers.txt"
 
@@ -185,9 +171,13 @@ def remove_negated_phrases(
         # remove negated phrases
         for phrase in negated_phrases:
             print(phrase, "[PREN] " + phrase in tagged_sentence)
-            # if phrase is before or afte [PREN] or [POST], remove it 
-            tagged_sentence = tagged_sentence.replace("[PREN] " + phrase, " XXXXX")
-            tagged_sentence = tagged_sentence.replace(phrase + " [POST]", "XXXXX ")
+            # if phrase is before or afte [PREN] or [POST], remove it
+            tagged_sentence = tagged_sentence.replace(
+                "[PREN] " + phrase, " XXXXX"
+            )
+            tagged_sentence = tagged_sentence.replace(
+                phrase + " [POST]", "XXXXX "
+            )
 
         # Remove all the tags i.e. [PREN], [POST], [CONJ]
         tagged_sentence = re.sub(r"\[.*?\]", "", tagged_sentence)

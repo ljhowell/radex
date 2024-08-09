@@ -11,6 +11,7 @@ import pandas as pd
 
 from radex.radexpressions import string_search
 
+
 def flatten_list(list_in: list) -> list:
     """
     Recursive function to flatten a list of lists into a single 1D list.
@@ -109,7 +110,7 @@ def evaluate_logical_statement(
     candidate: str,
     expression: Union[list, str],
     verbose: Optional[bool] = False,
-) -> Union[list, str, bool]:
+) -> Union[str, bool]:
     """
     The main point of input to evaluate a logical statement.
 
@@ -123,7 +124,7 @@ def evaluate_logical_statement(
         ValueError: If the expression is not a valid logical expression
 
     Returns:
-        bool: The result of the logical expression evaluation
+        str, bool: The result of the logical expression evaluation
     """
 
     # Recursively evaluate a logical statement
@@ -151,9 +152,7 @@ def evaluate_logical_statement(
             result = string_search(candidate, expression.strip())
             if verbose:
                 print(list_to_string(expression), "=>", result[0], result[1])
-            return string_search(
-                candidate, expression.strip()
-            )[0]
+            return string_search(candidate, expression.strip())[0]
 
     if isinstance(expression, list):  # Evaluate sub-statements recursively
         expression = [
@@ -171,10 +170,10 @@ def evaluate_logical_statement(
                 list_to_string(expression)[1:-1],
                 "=>",
                 sub_results_str,
-                "=>",                    
+                "=>",
                 eval(sub_results_str),
             )
-        return eval(sub_results_str) 
+        return eval(sub_results_str)
 
     raise ValueError("Invalid logical statement")
 
