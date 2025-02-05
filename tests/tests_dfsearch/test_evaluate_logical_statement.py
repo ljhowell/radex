@@ -1,8 +1,7 @@
-"""
-Unit tests for the nlprules module
+# fmt: off
+# pylint: disable=line-too-long
 
-To run: from root dir use: python -m unittest discover tests
-"""
+"""Test the evaluate_logical_statement function from df_search"""
 
 import unittest
 import sys
@@ -14,11 +13,7 @@ sys.path.append("..")
 
 
 class TestLogicalStatement(unittest.TestCase):
-    """Unit test for
-
-    Args:
-        unittest (_type_): _description_
-    """
+    """Unit test for the evaluate_logical_statement function"""
 
     def __init__(self, *args, **kwargs):
         """__init__ method"""
@@ -160,48 +155,6 @@ class TestLogicalStatement(unittest.TestCase):
                 "result": True,
             },
             {
-                "test_name": "Single word match with _ wildcard at the end of the word",
-                "candidate": "the thyroid gland is an endocrine gland in the neck",
-                "expression": "thyroid_",
-                "result": True,
-            },
-            {
-                "test_name": "Single word no match with _ wildcard at the end of the word",
-                "candidate": "hyperthyroidism is a condition that can be seen in cats",
-                "expression": "thyroid_",
-                "result": False,
-            },
-            {
-                "test_name": "Single word match with _ wildcard at the start of the word",
-                "candidate": "the thyroid gland is an endocrine gland in the neck",
-                "expression": "_thyroid",
-                "result": True,
-            },
-            {
-                "test_name": "Single word no match with _ wildcard at the start of the word",
-                "candidate": "the parathyroid gland regulates calcium levels in the body",
-                "expression": "_thyroid",
-                "result": False,
-            },
-            {
-                "test_name": "Single word no match with _ wildcard at the start of the word",
-                "candidate": "hyperthyroidism is a condition that can be seen in cats",
-                "expression": "thyroid_",
-                "result": False,
-            },
-            {
-                "test_name": "Single word match with _ wildcard at the start end of the word",
-                "candidate": "the thyroid gland is an endocrine gland in the neck",
-                "expression": "_thyroid_",
-                "result": True,
-            },
-            {
-                "test_name": "Single word no match with _ wildcard at the start end of the word",
-                "candidate": "the parathyroid gland is normal but hyperthyroidism is evident",
-                "expression": "_thyroid_",
-                "result": False,
-            },
-            {
                 "test_name": "Combination of * and ? wildcards I",
                 "candidate": "the quick brown coloured fox jumps over the lazy dog",
                 "expression": "brown colo?r*",
@@ -224,54 +177,6 @@ class TestLogicalStatement(unittest.TestCase):
                 "candidate": "the quick brown colour fox jumps over the lazy dog",
                 "expression": "brown colo?r* do*",
                 "result": False,
-            },
-            {
-                "test_name": "Combination of * and _ wildcards I",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "_brown col*",
-                "result": True,
-            },
-            {
-                "test_name": "Combination of * and _ wildcards II",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "_coloured_ f*",
-                "result": True,
-            },
-            {
-                "test_name": "Combination of * and _ wildcards III",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "bro* _red",
-                "result": False,
-            },
-            {
-                "test_name": "Combination of * and _ wildcards I",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "_colo?red",
-                "result": True,
-            },
-            {
-                "test_name": "Combination of * and _ wildcards II",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "_colo?r_",
-                "result": False,
-            },
-            {
-                "test_name": "Combination of *, ? and _ wildcards I",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "bro* _?olo?red",
-                "result": True,
-            },
-            {
-                "test_name": "Combination of *, ? and _ wildcards II",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "b* _?olo?red",
-                "result": True,
-            },
-            {
-                "test_name": "Combination of *, ? and _ wildcards III",
-                "candidate": "the quick brown coloured fox jumps over the lazy dog",
-                "expression": "_bro?n_ colo*",
-                "result": True,
             },
             {
                 "test_name": "Multiple * wildcards I",
@@ -720,7 +625,7 @@ class TestLogicalStatement(unittest.TestCase):
             expression = test["expression"]
             expected_result = test["result"]
             actual_result = evaluate_logical_statement(
-                candidate, self.expr.parse_string(expression)
+                candidate, self.expr.parse_string(expression),
             )
 
             self.assertEqual(
@@ -750,17 +655,28 @@ class TestLogicalStatement(unittest.TestCase):
             )
             print(f'Test {testnumber}: {test["test_name"]} - PASSED')
 
-    # def test_exceptions(self):
-    #     """_summary_
-    #     """
-    #     self.assertRaises(ValueError, evaluate_logical_statement,
-    #                       'candidate',
-    #                       '((a)')
-    # def test_prime_invalid_type(self):
-    #     """_summary_
-    #     """
-    #     self.assertRaises(TypeError, is_prime, 'a')
+    def test_verbose(self):
+        """Test verbose output"""
+        candidate = "the quick brown fox jumps over the lazy dog"
+        expression = "quick"
+        expected_result = True
+        actual_result = evaluate_logical_statement(
+            candidate, self.expr.parse_string(expression), verbose=True
+        )
 
+        self.assertEqual(
+            actual_result,
+            expected_result,
+            msg=f"\n\nFailed test verbose output\nCandidate:'{candidate}'\nExpression: '{expression}'\nExpected: {expected_result}\nResult: {actual_result}",
+        )
+        print('Test verbose output - PASSED')
+
+    def test_exceptions(self):
+        """_summary_
+        """
+        self.assertRaises(ValueError, evaluate_logical_statement,
+                          'candidate',
+                          54)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

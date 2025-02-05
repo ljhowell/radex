@@ -3,23 +3,18 @@ Preprocessing functions for text data.
 Includes functions to clean text, remove stopwords, and combine columns.
 """
 
-import re  # regex
-from typing import List, Optional, Union  # type hinting
+import re
+from typing import List, Union
 
-import pandas as pd  # pandas for dataframes
+import pandas as pd
 
-from negex.negexPython.negex import negTagger, sortRules
+from negex.negexPython.negex import negTagger
 
 
 def clean_dataframe(
     df_data: pd.DataFrame,
     text_columns: Union[List[str], str],
-    drop_duplicates: bool = False,
-    drop_nulls: bool = False,
-    drop_negatives: bool = False,
-    drop_ambiguous: bool = False,
-    drop_stopwords: bool = False,
-    replace_connectors: bool = False,
+    **kwargs,
 ) -> pd.DataFrame:
     """
     Clean dataframe by removing punctuation, new line characters, and trailing whitespace.
@@ -27,18 +22,22 @@ def clean_dataframe(
     Optionally drop duplicates, nulls, and empty rows.
 
     Args:
-        df (pd.DataFrame): The dataframe to clean.
-        text_columns (str): The column(s) to clean.
-        drop_duplicates (bool, optional): Drop duplicate rows. Defaults to True.
-        drop_nulls (bool, optional): Drop rows with null values. Defaults to True.
-        drop_negatives (bool, optional): Remove negated phrases. Defaults to True.
-        drop_ambiguous (bool, optional): Remove ambiguous phrases. Defaults to True.
-        drop_stopwords (bool, optional): Remove stopwords. Defaults to True.
-        replace_connectors (bool, optional): Replace connectors with full stops. Defaults to True.
+        df_data (pd.DataFrame): The dataframe to clean.
+        text_columns (Union[List[str], str]): The text columns to clean.
+        **kwargs: Additional keyword arguments.
+            drop_duplicates (bool, optional): Whether to drop duplicates. Defaults to False.
+            drop_nulls (bool, optional): Whether to drop nulls. Defaults to False.
+            drop_negatives (list, optional): List of negation rules to remove. Defaults to None.
+            drop_stopwords (list, optional): List of stopwords to remove. Defaults to None.
 
     Returns:
         pd.DataFrame: The cleaned dataframe.
     """
+    drop_duplicates = kwargs.get("drop_duplicates", False)
+    drop_nulls = kwargs.get("drop_nulls", False)
+    drop_negatives = kwargs.get("drop_negatives", None)
+    drop_stopwords = kwargs.get("drop_stopwords", None)
+
     if isinstance(text_columns, str):
         text_columns = [text_columns]
 
@@ -49,122 +48,62 @@ def clean_dataframe(
         if drop_nulls:
             df_data = df_data.dropna(subset=[col])  # drop nulls
 
-        df_data[col] = df_data[col].str.replace(
-            "\n", " ", regex=True
-        )  # remove new line characters
-        df_data[col] = df_data[col].str.replace(
-            "/", " ", regex=True
-        )  # remove forward slash
-        df_data[col] = df_data[col].str.replace(
-            "-", " ", regex=True
-        )  # remove dash
-        df_data[col] = df_data[col].str.replace(
-            r"[^\w\s.]", "", regex=True
-        )  # remove punctuation
-        df_data[col] = df_data[col].str.replace(
-            r"\s+", " ", regex=True
-        )  # remove whitespace
-        df_data[col] = df_data[col].str.replace(
-            r"\.$", "", regex=True
-        )  # remove trailing period
-        df_data[col] = df_data[col].str.lower()  # Convert to lowercase
+        # remove new line characters
+        df_data[col] = df_data[col].str.replace("\n", " ", regex=True)
+        # remove forward slash
+        df_data[col] = df_data[col].str.replace("/", " ", regex=True)
+        # remove dash
+        df_data[col] = df_data[col].str.replace("-", " ", regex=True)
+        # remove punctuation
+        df_data[col] = df_data[col].str.replace(r"[^\w\s.]", "", regex=True)
+        # remove extra whitespace
+        df_data[col] = df_data[col].str.replace(r"\s+", " ", regex=True)
+        # remove trailing period
+        df_data[col] = df_data[col].str.replace(r"\.$", "", regex=True)
+        # Convert to lowercase
+        df_data[col] = df_data[col].str.lower()
 
         if drop_negatives:
             df_data[col] = df_data[col].apply(
                 lambda x: remove_negated_phrases(
                     x,
-                    rules_file=None,
-                    drop_ambiguous=drop_ambiguous,
-                    replace_tagged=replace_connectors,
+                    rules=drop_negatives,
                 )
             )
+
         if drop_stopwords:
-            df_data = remove_stopwords(df_data, text_columns=[col])
+            df_data[col] = df_data[col].apply(
+                lambda x: remove_stopwords(
+                    x,
+                    stopwords=drop_stopwords,
+                )
+            )
+
+        # Remove extra whitespace
+        df_data[col] = df_data[col].str.strip()
 
     return df_data
 
 
-def remove_stopwords_str(
-    text: str, stop_words: Optional[set[str]] = None
-) -> str:
-    """Remove stopwords from a string.
-
-    Args:
-        text (str): The candidate text to remove stopwords from.
-        stop_words (Optional[set[str]], optional): Set of stopwords to remove. Defaults to None.
-
-    Returns:
-        str: String with stopwords removed.
-    """
-    # Load stopwords from csv]
-    if stop_words is None:
-        ls_stop_words = pd.read_csv("radex/stopwords.csv").T.values[0]
-        exceptions = [
-            "no",
-            "not",
-            "nor",
-            "few",
-            "other",
-        ]  # don't remove these words
-        ls_stop_words = [
-            word for word in ls_stop_words if word not in exceptions
-        ]
-        stop_words = set(ls_stop_words)
-
-    stop_words = set(
-        re.sub(r"[^\w\s]", "", s) for s in stop_words
-    )  # remove punctuation
-    text = re.sub(r"\b(" + r"|".join(stop_words) + r")\b\s*", "", text)
-    return text
-
-
 def remove_stopwords(
-    df: pd.DataFrame,
-    text_columns: Union[str, List[str]],
-    stop_words: Optional[set[str]] = None,
-) -> pd.DataFrame:
+    text: str,
+    stopwords: List,
+) -> str:
     """
-    Remove stopwords from text columns.
+    Remove stopwords from text.
 
     Args:
-        df (pd.DataFrame): Dataframe to remove stopwords from.
-        text_columns (str, list[str]): The text columns to remove stopwords from.
-        stop_words (set[str]): List of stopwords. Defaults to None.
+        df (str): Data to remove stopwords from.
+        stopwords (list[str]): List of stopwords.
 
     Returns:
-        pd.DataFrame: Dataframe with stopwords removed.
+        str: The text with stopwords removed.
     """
+    # remove punctuation from stopwords
+    stopwords = list(re.sub(r"[^\w\s]", "", s) for s in stopwords)
 
-    # Load stopwords from csv]
-    if stop_words is None:
-        ls_stop_words = pd.read_csv("radex/stopwords.csv").T.values[0]
-        exceptions = [
-            "no",
-            "not",
-            "nor",
-            "few",
-            "other",
-        ]  # don't remove these words
-        ls_stop_words = [
-            word for word in ls_stop_words if word not in exceptions
-        ]
-        stop_words = set(ls_stop_words)
-
-    stop_words = set(
-        re.sub(r"[^\w\s]", "", s) for s in stop_words
-    )  # remove punctuation
-
-    if isinstance(text_columns, str):
-        text_columns = [text_columns]
-
-    for (
-        col
-    ) in text_columns:  # Remove stopwords from text in each column using regex
-        df[col] = df[col].apply(
-            lambda x: re.sub(r"\b(" + r"|".join(stop_words) + r")\b\s*", "", x)
-        )
-
-    return df
+    data = re.sub(r"\b(" + r"|".join(stopwords) + r")\b\s*", "", text)
+    return data
 
 
 def merge_columns(
@@ -172,7 +111,6 @@ def merge_columns(
     cols: list,
     new_col_name: str = "combined",
     delimiter: str = " ",
-    inplace=False,
 ) -> pd.DataFrame:
     """
     Combine multiple columns with strings into a single column.
@@ -182,7 +120,6 @@ def merge_columns(
         cols (list): The columns to combine.
         new_col_name (str, optional): The name of the new column. Defaults to 'combined'.
         delimiter (str, optional): The delimiter to use between columns. Defaults to ' '.
-        inplace (bool, optional): Whether to modify the dataframe inplace. Defaults to False.
 
     Returns:
         pd.DataFrame: The dataframe with the columns combined.
@@ -194,17 +131,12 @@ def merge_columns(
     for col in cols[1:]:
         df_copy[new_col_name] += delimiter + df_copy[col]
 
-    if inplace:
-        df_copy.drop(columns=cols, inplace=True)
-
     return df_copy
 
 
 def remove_negated_phrases(
     text: str,
-    rules_file: Optional[str] = None,
-    drop_ambiguous: bool = False,
-    replace_tagged: bool = False,
+    rules: List,
     verbose: bool = False,
 ):
     """
@@ -213,46 +145,51 @@ def remove_negated_phrases(
     Args:
         text (str): The input text from which negated phrases will be removed.
         rules_file (str, optional): Path to negation rules.
-        drop_ambiguous (bool, optional): Whether to drop ambiguous phrases. Defaults to False.
-        replace_tagged (bool, optional): Replace tagged words with XXXXX. Defaults to False.
         verbose (bool, optional): Whether to print the tagged sentence. Defaults to False.
 
     Returns:
         str: The text with negated phrases removed.
     """
 
-    if rules_file is None:
-        rules_file = r"negex/negexPython/negex_triggers.txt"
+    # if rules_file is None:
+    #     rules_file = r"negex/negexPython/negex_triggers.txt"
 
-    with open(rules_file, encoding="utf-8") as rfile:
-        rules = sortRules(rfile.readlines())
+    # with open(rules_file, encoding="utf-8") as rfile:
+    #     rules = sortRules(rfile.readlines())
 
     output = ""
     for sentence in text.split("."):
         tagger = negTagger(
-            sentence=sentence, phrases=[], rules=rules, negP=drop_ambiguous
+            sentence=sentence, phrases=[], rules=rules, negP=False
         )
         negated_phrases = tagger.getScopes()
         tagged_sentence = tagger.getNegTaggedSentence()
 
         if verbose:
-            print(tagged_sentence, text)
+            print(tagged_sentence, negated_phrases)
 
         # remove negated phrases
         for phrase in negated_phrases:
-            text = text.replace(phrase, "XXXXX")
+            print(phrase, "[PREN] " + phrase in tagged_sentence)
+            # if phrase is before or afte [PREN] or [POST], remove it
+            tagged_sentence = tagged_sentence.replace(
+                "[PREN] " + phrase, " XXXXX"
+            )
+            tagged_sentence = tagged_sentence.replace(
+                phrase + " [POST]", "XXXXX "
+            )
 
-        # Remove words between any tags
-        if replace_tagged:
-            text = re.sub(r"\[.*?\].*?\[.*?\]", "", tagged_sentence)
+        # Remove all the tags i.e. [PREN], [POST], [CONJ]
+        tagged_sentence = re.sub(r"\[.*?\]", "", tagged_sentence)
+        print(tagged_sentence)
 
-        output += text + ". "
+        output += tagged_sentence + ". "
 
     # Clean up text
-    text = re.sub(r"\s+", " ", text)  # remove extra whitespace
-    text = re.sub(r"\s+\.", ".", text)  # remove spaces before full stops
-    text = re.sub(r"\.+", ".", text)  # remove extra full stops
-    text = text.strip()  # remove trailing whitespace
-    text = re.sub(r"\.$", "", text)  # remove trailing full stop
+    output = re.sub(r"\s+", " ", output)  # remove extra whitespace
+    output = re.sub(r"\s+\.", ".", output)  # remove spaces before full stops
+    output = re.sub(r"\.+", ".", output)  # remove extra full stops
+    output = output.strip()  # remove trailing whitespace
+    output = re.sub(r"\.$", "", output)  # remove trailing full stop
 
-    return text
+    return output
