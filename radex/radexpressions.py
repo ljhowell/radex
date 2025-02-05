@@ -37,7 +37,6 @@ def get_regex_wildcards(expression: str) -> str:
     Allowed wildcards are:
     - '*' for a multiple character wildcard e.g. 'colou*' will match 'colour' and 'colours'
     - '?' for a single/none character wildcard e.g. 'colo?r' will match 'colour' and 'color'
-    - '_' for a word boundary e.g. 'color_' will match 'colour' but not 'colors'
 
     Args:
         expression (str): The regular expression with wildcards.
@@ -52,7 +51,6 @@ def get_regex_wildcards(expression: str) -> str:
     regex = regex.replace(
         r"\?", r".?"
     )  # replace ? with single character wildcard
-    regex = regex.replace(r"_", r"\b")  # replace _ with word boundary
 
     # add word boundary to start and end of regex
     regex = r"\b" + regex + r"\b"
@@ -107,15 +105,18 @@ def get_regex_proximity(
     return regex
 
 
-def string_search(candidate: str, expression: str, return_bool: bool = False):
+def string_search(
+    candidate: str,
+    expression: str,
+) -> tuple:
     """
     Evaluates a logical expression containing wildcards */?/_ or proximity matching ~X.
     e.g.
         candidate="The quick brown fox jumps over the lazy dog",
         expression="quick~2fo*"
-        => [('quick brown fox ', 4, 20)]
+        => (True, [('quick brown fox ', 4, 20)])
 
-    For the proximity search@
+    For the proximity search
         wordA ~2 wordB => wordB must be a maximum of 2 words after wordA
         wordA ~~2 wordB => wordB must be a maximum of 2 words before OR after wordA
 
@@ -128,10 +129,7 @@ def string_search(candidate: str, expression: str, return_bool: bool = False):
         ValueError: If the expression is invalid.
 
     Returns:
-        list or bool:
-                If return_bool is False, returns a list of tuples,
-                    where each tuple contains the matched substring and its start and end indices.
-                If return_bool is True, returns a boolean value for if 1 or more matches are found.
+        tuple: A tuple containing a boolean indicating if the expression was found in the candidate and a list of matches.
     """
 
     # Proximity search
@@ -145,12 +143,7 @@ def string_search(candidate: str, expression: str, return_bool: bool = False):
             word2 = parts[2].strip()
 
             # Get max distance from proximity string e.g. '~2'
-            try:
-                max_distance = int(parts[1].replace("~", ""))
-            except ValueError:
-                print(
-                    f"Invalid max distance in proximity search: {expression}"
-                )
+            max_distance = int(parts[1].replace("~", ""))
 
             # Decide whether to do a center search or right search
             if parts[1].count("~") == 2:
@@ -170,8 +163,6 @@ def string_search(candidate: str, expression: str, return_bool: bool = False):
         regex = get_regex_wildcards(expression)
 
     result = evaluate_regex(candidate, regex)
-    if return_bool:
-        return len(result) > 0
 
     return (True, result) if len(result) > 0 else (False, result)
 

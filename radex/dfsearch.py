@@ -43,9 +43,9 @@ def list_to_string(input_list: Union[list, str]) -> str:
         str: The converted string.
     """
     if isinstance(input_list, list):
-        return "(" + " ".join([list_to_string(x) for x in input_list]) + ")"
+        return "(" + ", ".join([list_to_string(x) for x in input_list]) + ")"
     else:
-        return input_list.strip()
+        return str(input_list).strip()
 
 
 def check_all_matches(
@@ -77,7 +77,7 @@ def check_all_matches(
     ]  # Remove operators
 
     return {
-        part.strip(): string_search(candidate, part.strip(), return_bool=False)
+        part.strip(): string_search(candidate, part.strip())
         for part in expression
     }
 
@@ -110,7 +110,7 @@ def evaluate_logical_statement(
     candidate: str,
     expression: Union[list, str],
     verbose: Optional[bool] = False,
-) -> Union[bool, str]:
+) -> Union[str, bool]:
     """
     The main point of input to evaluate a logical statement.
 
@@ -124,15 +124,10 @@ def evaluate_logical_statement(
         ValueError: If the expression is not a valid logical expression
 
     Returns:
-        bool: The result of the logical expression evaluation
+        str, bool: The result of the logical expression evaluation
     """
 
     # Recursively evaluate a logical statement
-    if isinstance(expression, bool):
-        if verbose:
-            print("bool", expression)
-        return expression
-
     if isinstance(expression, str):  # symbol or statement to evaluate
         if expression in [
             "&",
@@ -157,9 +152,7 @@ def evaluate_logical_statement(
             result = string_search(candidate, expression.strip())
             if verbose:
                 print(list_to_string(expression), "=>", result[0], result[1])
-            return string_search(
-                candidate, expression.strip(), return_bool=True
-            )
+            return string_search(candidate, expression.strip())[0]
 
     if isinstance(expression, list):  # Evaluate sub-statements recursively
         expression = [
@@ -219,13 +212,13 @@ def search_dataframe(
         new_column_name = column + "_matches"
 
     # Filter a column based on a logical expression
-    df[new_column_name] = df[column].map(
-        lambda x: func(x, expression=expression, verbose=False)
+    df[new_column_name] = df[column].apply(
+        lambda x: func(str(x), expression=expression, verbose=False)
     )
 
     if debug_column:
-        df[new_column_name + "_matches"] = df[column].map(
-            lambda x: check_all_matches(x, expression)
+        df[new_column_name + "_matches"] = df[column].apply(
+            lambda x: check_all_matches(str(x), expression)
         )
 
     return df

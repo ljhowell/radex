@@ -92,18 +92,15 @@ class Expression:
         input_str = re.sub(r"THEN", r"~", input_str)
         input_str = re.sub(r"BEFORE", r"~", input_str)
 
+        # Remove extra spaces
+        input_str = re.sub(r"\s+", r" ", input_str)
+
         if verbose:
             print("Input string: ", input_str)
 
         parsed_list = self.grammar.parseString(input_str).as_list()
 
         self.check_input_string(input_str)
-
-        search_terms = set(re.findall(r"\b\w[\w*~?]*\b", input_str))
-        parsed_terms = set(re.findall(r"\b\w[\w*~?]*\b", str(parsed_list)))
-
-        if not len(search_terms) == len(parsed_terms):
-            raise ValueError(f"Input search string {input_str} is invalid.")
 
         return parsed_list
 
@@ -148,5 +145,41 @@ class Expression:
                     f"Input search string contains \
                                  invalid characters: {c} \n {input_str}"
                 )
+
+        # Check proximity opearators are followed by a number
+        input_str_tilde = input_str.replace("~~", "~")
+        for i, c in enumerate(input_str_tilde):
+            if c == "~":
+                if not input_str_tilde[i + 1].isdigit():
+                    raise ValueError(
+                        f"Proximity operator must be followed by a number \n {input_str}"
+                    )
+
+        # Find proximity searches i.e. word ~number word
+        proximity_searches = re.findall(
+            r"[*?]*\w+[*?]*\s?~\d+\s?[*?]*\w+[*?]*", input_str_tilde
+        )
+        # Find proximity searches i.e. word ~number
+        proximity_searches_i = re.findall(
+            r"[*?]*\w+[*?]*\s?~\d+", input_str_tilde
+        )
+        # Find word proximity searches i.e. ~number word
+        proximity_searches_ii = re.findall(
+            r"~\d+\s?[*?]*\w+[*?]*", input_str_tilde
+        )
+        print(
+            input_str_tilde,
+            proximity_searches,
+            proximity_searches_i,
+            proximity_searches_ii,
+        )
+        if (
+            not len(proximity_searches)
+            == len(proximity_searches_i)
+            == len(proximity_searches_ii)
+        ):
+            raise ValueError(
+                f"Proximity operator must be in the form 'word ~X word' \n {input_str}"
+            )
 
         return True
