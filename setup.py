@@ -38,7 +38,8 @@ setup(
     long_description_content_type="text/markdown",
     author="ljhowell",
     packages=find_packages(exclude=["tests", ".github"]),
-    install_requires=read_requirements("requirements.txt"),
+    install_requires=read_requirements("requirements.txt") + [
+        "negex @ git+https://github.com/ljhowell/radex.git@main#egg=negex"],
     entry_points={
         "console_scripts": ["radex = radex.__main__:main"]
     },
