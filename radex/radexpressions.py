@@ -3,6 +3,7 @@ Wrapper for regular expressions including wildcards and proximity matching.
 Evaluate regular expressions.
 """
 
+from math import e
 import re
 
 
@@ -91,12 +92,12 @@ def get_regex_proximity(
 
     if direction in ["centre", "center"]:
         regex = rf"\b{word1}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word2}\b|\b{word2}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word1}\b"
-
     elif direction == "right":
         regex = rf"\b{word1}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word2}\b"
-
     elif direction == "left":
         regex = rf"\b{word2}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word1}\b"
+    else:
+        raise ValueError("Invalid direction")
 
     regex = regex.replace(r"\*", r"\w*")  # non greedy matching
     regex = regex.replace(r"\?", r".?")
