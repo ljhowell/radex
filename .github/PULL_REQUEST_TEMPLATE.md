@@ -12,4 +12,3 @@ _Describe more what you did on changes._
 ### Checks
 - [ ] Closed #798
 - [ ] Tested Changes
-- [ ] Stakeholder Approval

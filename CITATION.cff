@@ -1,0 +1,73 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: RADEX
+message: Radiology Data EXtraction Tool
+type: software
+authors:
+  - given-names: Lewis
+    family-names: Howell
+    email: scljh@leeds.ac.uk
+    affiliation: University of Leeds
+    orcid: 'https://orcid.org/0000-0003-4807-4087'
+  - given-names: Amir
+    family-names: Zarei
+    affiliation: Leeds Teaching Hospitals NHS Trust
+  - given-names: Tze Min
+    family-names: Wah
+    affiliation: Leeds Teaching Hospitals NHS Trust
+  - given-names: James
+    family-names: Chandler
+    affiliation: University of Leeds
+  - given-names: Shishir
+    family-names: Karthik
+    affiliation: Leeds Teaching Hospitals NHS Trust
+  - given-names: Zara
+    family-names: Court
+    affiliation: Leeds Teaching Hospitals NHS Trust
+  - given-names: Helen
+    family-names: Ng
+    affiliation: Leeds Teaching Hospitals NHS Trust
+  - given-names: James
+    family-names: McLaughlan
+    email: j.r.mclaughlan@leeds.ac.uk
+    affiliation: University of Leeds
+    orcid: 'https://orcid.org/0000-0001-5795-4372'
+identifiers:
+  - type: doi
+    value: 10.1234/UPDATEME.4321
+    description: RADEX latest
+repository-code: 'https://github.com/ljhowell/radex'
+repository: 'https://github.com/ljhowell/radex/branchUPDATEME'
+abstract: >-
+  Clinical reports contain valuable information for research
+  and audit, but relevant details are often buried within
+  free-text fields. The RAdiology Data EXtraction tool
+  (RADEX) was designed as a simple and practical interface
+  for information extraction in clinical documents, enabling
+  context-dependent searching without specialist expertise
+  in Natural Language Processing.
+
+
+  RADEX relies on a user-friendly 'search strategy' which is
+  defined and refined to classify reports and extract
+  information for research and audit. In the code backend,
+  the search strategy is converted to a regular expression
+  model which is applied to the dataset.
+
+
+  If you use this software, please cite our paper: Howell et
+  al. (2025). European Radiology.
+  https://doi.org/10.1007/s00330-025-11416-4
+keywords:
+  - Natural Langauge Processing
+  - Information Extraction
+  - NLP
+  - Data annotation
+  - Ultrasound
+  - Rule-based
+license: BSD-3-Clause
+commit: TO_ADD
+version: 0.1.0
+date-released: '2025-02-06'
