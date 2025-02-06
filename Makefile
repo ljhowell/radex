@@ -18,8 +18,12 @@ show:             ## Show the current environment.
 	@$(ENV_PREFIX)python -V
 	@$(ENV_PREFIX)python -m site
 
+.PHONY: submodule
+submodule:        ## Initialize and update the submodule
+	git submodule update --init --recursive
+
 .PHONY: install
-install:          ## Install the project in dev mode.
+install: submodule         ## Install the project in dev mode.
 	@if [ "$(USING_POETRY)" ]; then poetry install && exit; fi
 	@echo "Don't forget to run 'make virtualenv' if you got errors."
 	$(ENV_PREFIX)pip install -e .[test]
@@ -90,7 +94,7 @@ release:          ## Create a new tag for release.
 .PHONY: docs
 docs:             ## Build the documentation.
 	@echo "building documentation ..."
-	@$(ENV_PREFIX)mkdocs build
+	@$(ENV_PREFIX)mkdocs build --clean
 	URL="site/index.html"; xdg-open $$URL || sensible-browser $$URL || x-www-browser $$URL || gnome-open $$URL || open $$URL
 
 .PHONY: switch-to-poetry
