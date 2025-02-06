@@ -6,8 +6,10 @@ Evaluate regular expressions.
 from math import e
 import re
 
+from typing import List
 
-def evaluate_regex(candidate: str, regex: str) -> list:
+
+def evaluate_regex(candidate: str, regex: str) -> List:
     """
     Performs a regex search on a candidate string, returning all matches and start/ end indices.
 
@@ -124,7 +126,6 @@ def string_search(
     Args:
         candidate (str): String to match against
         expression (str): Logical expression containing wildcards */?/_ or proximity matching ~X.
-        return_bool (bool, optional): Return True if >=1 matches are found. Defaults to False.
 
     Raises:
         ValueError: If the expression is invalid.
@@ -168,7 +169,7 @@ def string_search(
     return (True, result) if len(result) > 0 else (False, result)
 
 
-def wildcard_search(string, pattern):
+def wildcard_search(string:str, pattern:str) -> List:
     """Searches for the specified pattern in the string using Linux-style wildcards.
 
     Args:

@@ -14,7 +14,7 @@ from negex.negexPython.negex import negTagger
 def clean_dataframe(
     df_data: pd.DataFrame,
     text_columns: Union[List[str], str],
-    **kwargs,
+    **kwargs: Union[bool, List],
 ) -> pd.DataFrame:
     """
     Clean dataframe by removing punctuation, new line characters, and trailing whitespace.
@@ -93,7 +93,7 @@ def remove_stopwords(
     Remove stopwords from text.
 
     Args:
-        df (str): Data to remove stopwords from.
+        text (str): The input text from which stopwords will be removed.
         stopwords (list[str]): List of stopwords.
 
     Returns:
@@ -138,13 +138,13 @@ def remove_negated_phrases(
     text: str,
     rules: List,
     verbose: bool = False,
-):
+) -> str:
     """
     Use negex to remove negated phrases from text.
 
     Args:
         text (str): The input text from which negated phrases will be removed.
-        rules_file (str, optional): Path to negation rules.
+        rules (list): List of negation rules.
         verbose (bool, optional): Whether to print the tagged sentence. Defaults to False.
 
     Returns:
@@ -170,7 +170,8 @@ def remove_negated_phrases(
 
         # remove negated phrases
         for phrase in negated_phrases:
-            print(phrase, "[PREN] " + phrase in tagged_sentence)
+            if verbose:
+                print(phrase, "[PREN] " + phrase in tagged_sentence)
             # if phrase is before or afte [PREN] or [POST], remove it
             tagged_sentence = tagged_sentence.replace(
                 "[PREN] " + phrase, " XXXXX"
@@ -181,7 +182,9 @@ def remove_negated_phrases(
 
         # Remove all the tags i.e. [PREN], [POST], [CONJ]
         tagged_sentence = re.sub(r"\[.*?\]", "", tagged_sentence)
-        print(tagged_sentence)
+        
+        if verbose:
+            print(tagged_sentence)
 
         output += tagged_sentence + ". "
 
