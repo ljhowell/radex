@@ -19,8 +19,8 @@ RADEX relies on a user-friendly 'search strategy' which is defined and refined t
 ---
 # Getting started
 
-## Installation
 
+## Installation
 
 ## Install it from PyPI
 
@@ -28,20 +28,38 @@ RADEX relies on a user-friendly 'search strategy' which is defined and refined t
 pip install radex
 ```
 
-## Usage
-
-```py
-from radex import BaseClass
-from radex import base_function
-
-BaseClass().base_method()
-base_function()
+## Clone the repository and install the requirements
+```bash
+git clone https://github.com/ljhowell/radex
+pip install -r requirements.txt
 ```
 
-```bash
-$ python -m radex
-#or
-$ radex
+## Usage
+
+Demo with synthetic thyroid data
+```python
+from radex import Radex
+
+radex = Radex()
+radex.read_data('data/synthetic_ultrasound_reports/ex_usreports_validation.csv')
+radex.preprocess_data()
+
+radex.run_example_searches()
+radex.save_output('output.csv')
+```
+
+With custom searches
+```python
+from radex import Radex
+
+radex = Radex()
+radex.read_data('data/synthetic_ultrasound_reports/ex_usreports_validation.csv')
+radex.preprocess_data()
+
+radex.searches = {'thyroid nodule': 'thyr* NEAR2 nodul*',
+                  'thyroid_surgery': '*thyroidectomy OR thyroid surgery'} 
+radex.run_searches()
+radex.save_output('output.csv')
 ```
 
 ## Development
