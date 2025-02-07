@@ -8,3 +8,6 @@ pytest-cov
 mypy
 gitchangelog
 mkdocs
+mkdocstrings[python]
+mkdocs-material
+ipykernel
