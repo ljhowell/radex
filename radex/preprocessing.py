@@ -8,7 +8,7 @@ from typing import List, Union
 
 import pandas as pd
 
-from negex.negexPython.negex import negTagger
+from negex.negexPython.negex import negTagger, sortRules
 
 
 def clean_dataframe(
@@ -41,6 +41,9 @@ def clean_dataframe(
     if isinstance(text_columns, str):
         text_columns = [text_columns]
 
+    if not all(isinstance(col, str) for col in text_columns):
+        raise ValueError("text_columns must contains the column names as a string or list of strings")
+
     for col in text_columns:
 
         if drop_duplicates:
@@ -64,6 +67,11 @@ def clean_dataframe(
         df_data[col] = df_data[col].str.lower()
 
         if drop_negatives:
+            if drop_negatives == 'negex': # load negex default rules
+                rules_file = r"negex/negexPython/negex_triggers.txt"
+                with open(rules_file, encoding="utf-8") as rfile:
+                    drop_negatives = sortRules(rfile.readlines())
+
             df_data[col] = df_data[col].apply(
                 lambda x: remove_negated_phrases(
                     x,
@@ -72,6 +80,9 @@ def clean_dataframe(
             )
 
         if drop_stopwords:
+            if drop_stopwords == 'nltk': # load nltk default stopwords
+                drop_stopwords = pd.read_csv('data/stopwords.csv').T.values[0]
+
             df_data[col] = df_data[col].apply(
                 lambda x: remove_stopwords(
                     x,
@@ -166,12 +177,13 @@ def remove_negated_phrases(
         tagged_sentence = tagger.getNegTaggedSentence()
 
         if verbose:
-            print(tagged_sentence, negated_phrases)
+            print('Tagged sentence:', tagged_sentence)
+            print('Negated phrases to be removed:', negated_phrases)
 
         # remove negated phrases
         for phrase in negated_phrases:
-            if verbose:
-                print(phrase, "[PREN] " + phrase in tagged_sentence)
+            # if verbose:
+            #     print(phrase, "[PREN] " + phrase in tagged_sentence)
             # if phrase is before or afte [PREN] or [POST], remove it
             tagged_sentence = tagged_sentence.replace(
                 "[PREN] " + phrase, " XXXXX"
@@ -182,9 +194,9 @@ def remove_negated_phrases(
 
         # Remove all the tags i.e. [PREN], [POST], [CONJ]
         tagged_sentence = re.sub(r"\[.*?\]", "", tagged_sentence)
-        
+
         if verbose:
-            print(tagged_sentence)
+            print('Sentence with negated phrases removed:', tagged_sentence)
 
         output += tagged_sentence + ". "
 
