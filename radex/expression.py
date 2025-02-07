@@ -167,7 +167,7 @@ class Expression:
         proximity_searches_ii = re.findall(
             r"~\d+\s?[*?]*\w+[*?]*", input_str_tilde
         )
-
+        
         if (
             not len(proximity_searches)
             == len(proximity_searches_i)
