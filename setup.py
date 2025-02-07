@@ -37,7 +37,8 @@ setup(
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author="ljhowell",
-    packages=find_packages(exclude=["tests", ".github"]),
+    packages=find_packages(exclude=["tests", ".github"]) + ['negex'],
+    package_dir={'negex': './negex'},
     install_requires=read_requirements("requirements.txt"),
     entry_points={
         "console_scripts": ["radex = radex.__main__:main"]

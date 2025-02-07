@@ -1,17 +1,28 @@
-# Welcome to MkDocs
+# RADEX Docs
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Demo searches
+```python
+from radex import Radex
 
-## Commands
+radex = Radex()
+radex.read_data('data/synthetic_ultrasound_reports/ex_usreports_validation.csv')
+radex.preprocess_data()
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+radex.run_example_searches()
+radex.save_output('output.csv')
+```
 
-## Project layout
+With custom searches
+```python
+from radex import Radex
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+radex = Radex()
+radex.read_data('data/synthetic_ultrasound_reports/ex_usreports_validation.csv')
+radex.preprocess_data()
+
+radex.searches = {'thyroid nodule': 'thyr* NEAR2 nodul*'} # custom search-name: searches
+radex.run_searches()
+radex.save_output('output.csv')
+```
+
+

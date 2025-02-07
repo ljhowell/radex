@@ -4,9 +4,11 @@ Evaluate regular expressions.
 """
 
 import re
+from math import e
+from typing import List
 
 
-def evaluate_regex(candidate: str, regex: str) -> list:
+def evaluate_regex(candidate: str, regex: str) -> List:
     """
     Performs a regex search on a candidate string, returning all matches and start/ end indices.
 
@@ -91,10 +93,8 @@ def get_regex_proximity(
 
     if direction in ["centre", "center"]:
         regex = rf"\b{word1}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word2}\b|\b{word2}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word1}\b"
-
     elif direction == "right":
         regex = rf"\b{word1}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word2}\b"
-
     elif direction == "left":
         regex = rf"\b{word2}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word1}\b"
 
@@ -123,7 +123,6 @@ def string_search(
     Args:
         candidate (str): String to match against
         expression (str): Logical expression containing wildcards */?/_ or proximity matching ~X.
-        return_bool (bool, optional): Return True if >=1 matches are found. Defaults to False.
 
     Raises:
         ValueError: If the expression is invalid.
@@ -167,7 +166,7 @@ def string_search(
     return (True, result) if len(result) > 0 else (False, result)
 
 
-def wildcard_search(string, pattern):
+def wildcard_search(string: str, pattern: str) -> List:
     """Searches for the specified pattern in the string using Linux-style wildcards.
 
     Args:

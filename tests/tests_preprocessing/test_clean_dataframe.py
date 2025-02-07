@@ -65,6 +65,18 @@ def test_clean_dataframe(_sample_dataframe, _sample_stopwords, _sample_negation_
                                            'unusual words kept pizza cow common words dropped',
                                            'dog fast fox not XXXXX. rabbit fastest'
                                           ]
+    
+def test_clean_dataframe_valueerror(_sample_dataframe):
+    """Test the clean_dataframe function with ValueError"""
+    # Test ValueError for text_columns
+    with pytest.raises(ValueError):
+        clean_dataframe(_sample_dataframe,
+                        text_columns=[1],
+                        drop_duplicates=True,
+                        drop_nulls=True,
+                        drop_negatives=None,
+                        drop_stopwords=None,
+                        )
 
 def test_remove_negated_phrases(_sample_negation_rules):
     """Test the remove_negated_phrases function"""

@@ -1,2 +1,18 @@
-site_name: radex
-theme: readthedocs
+site_name: Radex Documentation
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [radex]  # Specify the exact path to your module
+          options:
+            show_source: true
+            show_submodules: true
+
+nav:
+  - Home: index.md
+  - API Reference: api.md
