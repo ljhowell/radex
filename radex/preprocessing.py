@@ -3,7 +3,6 @@ Preprocessing functions for text data.
 Includes functions to clean text, remove stopwords, and combine columns.
 """
 
-from pickle import STOP
 import re
 from pathlib import Path
 from typing import List, Union
@@ -12,11 +11,8 @@ import pandas as pd
 
 from negex.negexPython.negex import negTagger, sortRules
 
-RULES_FILE = Path(__file__).parent.parent / 'data' / 'negex_triggers.txt'
-STOPWORDS_FILE = Path(__file__).parent.parent / 'data' / 'stopwords.csv'
-
-# assert RULES_FILE.exists(), f"Negex rules file not found: {RULES_FILE}"
-print(RULES_FILE)
+RULES_FILE = Path(__file__).parent.parent / "data" / "negex_triggers.txt"
+STOPWORDS_FILE = Path(__file__).parent.parent / "data" / "stopwords.csv"
 
 
 def clean_dataframe(
@@ -78,8 +74,7 @@ def clean_dataframe(
 
         if drop_negatives:
             if drop_negatives == "negex":  # load negex default rules
-                rules_file = RULES_FILE
-                with open(rules_file, encoding="utf-8") as rfile:
+                with open(RULES_FILE, encoding="utf-8") as rfile:
                     drop_negatives = sortRules(rfile.readlines())
 
             df_data[col] = df_data[col].apply(

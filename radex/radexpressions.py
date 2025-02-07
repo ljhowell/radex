@@ -98,7 +98,6 @@ def get_regex_proximity(
     elif direction == "left":
         regex = rf"\b{word2}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word1}\b"
 
-
     regex = regex.replace(r"\*", r"\w*")  # non greedy matching
     regex = regex.replace(r"\?", r".?")
     regex = regex.replace(r"_", r"\b")  # replace _ with word boundary
