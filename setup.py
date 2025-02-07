@@ -38,23 +38,9 @@ setup(
     long_description_content_type="text/markdown",
     author="ljhowell",
     packages=find_packages(exclude=["tests", ".github"]),
-    install_requires=[
-        *read_requirements("requirements.txt"),
-        "negex @ git+https://github.com/ljhowell/negex.git@master#egg=negex"
-    ],
+    install_requires=read_requirements("requirements.txt"),
+    entry_points={
+        "console_scripts": ["radex = radex.__main__:main"]
+    },
     extras_require={"test": read_requirements("requirements-test.txt")},
-    classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-    ],
-    license="BSD 3-Clause License",
-    python_requires='>=3.7',
 )
