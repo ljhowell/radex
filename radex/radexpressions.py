@@ -3,9 +3,8 @@ Wrapper for regular expressions including wildcards and proximity matching.
 Evaluate regular expressions.
 """
 
-from math import e
 import re
-
+from math import e
 from typing import List
 
 
@@ -98,8 +97,7 @@ def get_regex_proximity(
         regex = rf"\b{word1}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word2}\b"
     elif direction == "left":
         regex = rf"\b{word2}\b\W+(?:\w+\W+){{0,{max_dist}}}?\b{word1}\b"
-    else:
-        raise ValueError("Invalid direction")
+
 
     regex = regex.replace(r"\*", r"\w*")  # non greedy matching
     regex = regex.replace(r"\?", r".?")
@@ -169,7 +167,7 @@ def string_search(
     return (True, result) if len(result) > 0 else (False, result)
 
 
-def wildcard_search(string:str, pattern:str) -> List:
+def wildcard_search(string: str, pattern: str) -> List:
     """Searches for the specified pattern in the string using Linux-style wildcards.
 
     Args:

@@ -18,10 +18,6 @@ show:             ## Show the current environment.
 	@$(ENV_PREFIX)python -V
 	@$(ENV_PREFIX)python -m site
 
-.PHONY: submodule
-submodule:        ## Initialize and update the submodule
-	git submodule update --init --recursive
-
 .PHONY: install
 install: submodule         ## Install the project in dev mode.
 	@if [ "$(USING_POETRY)" ]; then poetry install && exit; fi
@@ -67,8 +63,12 @@ clean:            ## Clean unused files.
 	@rm -rf .tox/
 	@rm -rf docs/_build
 
+.PHONY: submodule
+submodule:        ## Initialize and update the submodule
+	@git submodule update --init --recursive
+
 .PHONY: virtualenv
-virtualenv:       ## Create a virtual environment.
+virtualenv: submodule      ## Create a virtual environment.
 	@if [ "$(USING_POETRY)" ]; then poetry install && exit; fi
 	@echo "creating virtualenv ..."
 	@rm -rf .venv

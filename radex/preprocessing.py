@@ -3,18 +3,26 @@ Preprocessing functions for text data.
 Includes functions to clean text, remove stopwords, and combine columns.
 """
 
+from pickle import STOP
 import re
+from pathlib import Path
 from typing import List, Union
 
 import pandas as pd
 
 from negex.negexPython.negex import negTagger, sortRules
 
+RULES_FILE = Path(__file__).parent.parent / 'data' / 'negex_triggers.txt'
+STOPWORDS_FILE = Path(__file__).parent.parent / 'data' / 'stopwords.csv'
+
+# assert RULES_FILE.exists(), f"Negex rules file not found: {RULES_FILE}"
+print(RULES_FILE)
+
 
 def clean_dataframe(
     df_data: pd.DataFrame,
     text_columns: Union[List[str], str],
-    **kwargs: Union[bool, List],
+    **kwargs,
 ) -> pd.DataFrame:
     """
     Clean dataframe by removing punctuation, new line characters, and trailing whitespace.
@@ -42,7 +50,9 @@ def clean_dataframe(
         text_columns = [text_columns]
 
     if not all(isinstance(col, str) for col in text_columns):
-        raise ValueError("text_columns must contains the column names as a string or list of strings")
+        raise ValueError(
+            "text_columns must contains the column names as a string or list of strings"
+        )
 
     for col in text_columns:
 
@@ -67,8 +77,8 @@ def clean_dataframe(
         df_data[col] = df_data[col].str.lower()
 
         if drop_negatives:
-            if drop_negatives == 'negex': # load negex default rules
-                rules_file = r"negex/negexPython/negex_triggers.txt"
+            if drop_negatives == "negex":  # load negex default rules
+                rules_file = RULES_FILE
                 with open(rules_file, encoding="utf-8") as rfile:
                     drop_negatives = sortRules(rfile.readlines())
 
@@ -80,8 +90,8 @@ def clean_dataframe(
             )
 
         if drop_stopwords:
-            if drop_stopwords == 'nltk': # load nltk default stopwords
-                drop_stopwords = pd.read_csv('data/stopwords.csv').T.values[0]
+            if drop_stopwords == "nltk":  # load nltk default stopwords
+                drop_stopwords = pd.read_csv(STOPWORDS_FILE).T.values[0]
 
             df_data[col] = df_data[col].apply(
                 lambda x: remove_stopwords(
@@ -177,8 +187,8 @@ def remove_negated_phrases(
         tagged_sentence = tagger.getNegTaggedSentence()
 
         if verbose:
-            print('Tagged sentence:', tagged_sentence)
-            print('Negated phrases to be removed:', negated_phrases)
+            print("Tagged sentence:", tagged_sentence)
+            print("Negated phrases to be removed:", negated_phrases)
 
         # remove negated phrases
         for phrase in negated_phrases:
@@ -196,7 +206,7 @@ def remove_negated_phrases(
         tagged_sentence = re.sub(r"\[.*?\]", "", tagged_sentence)
 
         if verbose:
-            print('Sentence with negated phrases removed:', tagged_sentence)
+            print("Sentence with negated phrases removed:", tagged_sentence)
 
         output += tagged_sentence + ". "
 

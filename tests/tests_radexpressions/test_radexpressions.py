@@ -89,6 +89,14 @@ def test_get_regex_proximity():
     direction = "centre"
     with pytest.raises(ValueError):
         get_regex_proximity(word1, word2, max_distance, direction) # type: ignore
+        
+    # Invalid direction
+    word1 = "quick"
+    word2 = "fox"
+    max_distance = 2
+    direction = "NOT A DIRECTION"
+    with pytest.raises(ValueError):
+        get_regex_proximity(word1, word2, max_distance, direction) # type: ignore
 
 def test_string_search():
     """Test the string_search function which wraps the regex evaluation"""
