@@ -22,12 +22,6 @@ RADEX relies on a user-friendly 'search strategy' which is defined and refined t
 
 ## Installation
 
-## Install it from PyPI
-
-```bash
-pip install radex
-```
-
 ## Clone the repository and install the requirements
 ```bash
 git clone https://github.com/ljhowell/radex
