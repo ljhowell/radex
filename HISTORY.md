@@ -4,6 +4,33 @@ Changelog
 
 (unreleased)
 ------------
+- Merge branch 'main' of https://github.com/ljhowell/radex into main.
+  [eenultra]
+- Merge pull request #8 from ljhowell:docs. [Lewis Howell]
+
+  Documentation and base class
+- Basic docs. [eenultra]
+- Removed dockerfile for now as untested. [eenultra]
+- Fmt. [eenultra]
+- Ran lint and fmt. [eenultra]
+- Improved make process for submodule. Added test coverage. [eenultra]
+- Added Radex base class and tests. [eenultra]
+- In clean_dataframe: -add 'negex' as allowed value for drop_negatives
+  (default negex terms) -add 'nltk' as allowed value for drop_stopwords
+  (default nltk stopwords) [eenultra]
+- Minor changes to demo notebook in negex/stopwords. [eenultra]
+- Updated requirements and started to update README. [eenultra]
+- Basic docs with mkdocs to generate docs from module docstrings.
+  [eenultra]
+- Moved unnecessary print statements behind verbose flags. [eenultra]
+- Added submodule initialisation to setup.py. [eenultra]
+- Added submodule initialisation to makefile. [eenultra]
+- Raise ValueError if invalid direction for proximity search. [eenultra]
+
+
+0.2.0 (2025-02-07)
+------------------
+- Release: version 0.2.0 🚀 [eenultra]
 - Setup.py for submodule. [eenultra]
 - Added citation file. [eenultra]
 - Merge pull request #7 from
