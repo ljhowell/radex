@@ -96,6 +96,19 @@ def test_remove_negated_phrases(_sample_negation_rules):
                                     _sample_negation_rules, verbose=True) == 'The dog was not XXXXX. It was white'
 
 
+def test_remove_negated_phrases_preserves_decimal_numbers(_sample_negation_rules):
+    """Test that decimal measurements are not split by sentence cleanup"""
+    assert remove_negated_phrases(
+        'The nodule measures 1.5 cm. It is stable.',
+        _sample_negation_rules,
+    ) == 'The nodule measures 1.5 cm. It is stable'
+
+    assert remove_negated_phrases(
+        'The nodule size is 2.0 x 2.0 cm.',
+        _sample_negation_rules,
+    ) == 'The nodule size is 2.0 x 2.0 cm'
+
+
 def test_merge_columns(_sample_dataframe):
     """Test the merge_columns function"""
     # Merge columns

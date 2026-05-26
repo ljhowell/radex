@@ -9,7 +9,11 @@ from typing import List, Optional, Union
 
 import pandas as pd
 
-from radex.radexpressions import string_search
+from radex.radexpressions import (
+    extract_measurement_values,
+    split_sentences,
+    string_search,
+)
 
 
 def flatten_list(list_in: list) -> list:
@@ -98,7 +102,7 @@ def evaluate_sentences(
     Returns:
         bool: The result of the logical expression evaluation
     """
-    for sentence in candidate.split("."):
+    for sentence in split_sentences(candidate):
         if verbose:
             print("\nSentence:", sentence)
         if evaluate_logical_statement(sentence, expression, verbose=verbose):
@@ -184,6 +188,7 @@ def search_dataframe(
     expression: List,
     new_column_name: Optional[str] = None,
     debug_column: Optional[bool] = False,
+    verbose_debug: Optional[bool] = False,
     sentencizer: Optional[bool] = False,
 ) -> pd.DataFrame:
     """
@@ -197,6 +202,8 @@ def search_dataframe(
                                         Defaults to None.
         debug_column (bool, optional): Return matching strings for regex search to enable debugging.
                                         Defaults to False.
+        verbose_debug (bool, optional): Return matching sentences containing the match.
+                        Defaults to False.
         sentencizer (bool, optional): If True, search each sentence independently.
                                         Defaults to False.
 
@@ -220,5 +227,50 @@ def search_dataframe(
         df[new_column_name + "_matches"] = df[column].apply(
             lambda x: check_all_matches(str(x), expression)
         )
+        df[new_column_name + "_values"] = df[column].apply(
+            lambda x: _get_debug_values(str(x), expression, sentencizer)
+        )
+
+    if verbose_debug:
+        def _get_verbose_matches(value: str) -> list:
+            sentences = split_sentences(str(value))
+            matched_sentences = []
+            for sentence in sentences:
+                if evaluate_logical_statement(sentence, expression, verbose=False):
+                    matched_sentences.append(sentence)
+            return matched_sentences
+
+        df[new_column_name + "_verbose_matches"] = df[column].apply(
+            lambda x: _get_verbose_matches(x)
+        )
 
     return df
+
+
+def _get_debug_values(
+    value: str,
+    expression: List,
+    sentencizer: Optional[bool],
+) -> list:
+    """
+    Return extracted measurement values only from sentences that match the expression.
+
+    Args:
+        value (str): Candidate text.
+        expression (List): Parsed expression.
+        sentencizer (bool): Whether sentence-level evaluation is enabled.
+
+    Returns:
+        list: Extracted ``(value, unit)`` tuples from matching text.
+    """
+    if sentencizer:
+        sentences = split_sentences(str(value))
+    else:
+        sentences = [str(value).strip()]
+
+    values = []
+    for sentence in sentences:
+        if evaluate_logical_statement(sentence, expression, verbose=False):
+            values.extend(extract_measurement_values(sentence))
+
+    return values

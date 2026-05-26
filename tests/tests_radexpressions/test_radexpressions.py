@@ -126,6 +126,20 @@ def test_string_search():
     with pytest.raises(ValueError):
         string_search(candidate, expression)
 
+    candidate = "the nodule measures 2 cm"
+    expression = "MEASURE"
+    expected_result = [("2 cm", 20, 24)]
+    assert string_search(candidate, expression) == (True, expected_result)
+
+    expression = "nodule~~2MEASURE"
+    expected_result = [("nodule measures 2 cm", 4, 24)]
+    assert string_search(candidate, expression) == (True, expected_result)
+
+    candidate = "nodule size is 2.0 x 2.0 cm"
+    expression = "nodule~~2MEASURE"
+    expected_result = [("nodule size is 2.0 x 2.0 cm", 0, 27)]
+    assert string_search(candidate, expression) == (True, expected_result)
+
 def test_wildcard_search():
     """Test the wildcard_search function"""
 

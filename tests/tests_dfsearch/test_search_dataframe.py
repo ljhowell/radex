@@ -6,6 +6,7 @@
 
 import pandas as pd
 import pytest
+from radex.expression import Expression
 from radex.dfsearch import search_dataframe
 
 @pytest.fixture
@@ -68,4 +69,38 @@ def test_search_dataframe_debug_column_option(sample_dataframe):
         {'quick': (True, [('quick', 4, 9)])},
         {'quick': (False, [])},
         {'quick': (True, [('quick', 4, 9)])}
+    ]
+    assert result['text_matches_values'].tolist() == [[], [], []]
+
+
+def test_search_dataframe_measurement_token():
+    """Test searching with the MEASURE token and debug output"""
+    df = pd.DataFrame(
+        {
+            'text': [
+                'the nodule measures 2 cm',
+                'the report is otherwise normal',
+            ]
+        }
+    )
+
+    expression = Expression().parse_string('nodule~~2MEASURE')
+    result = search_dataframe(
+        df,
+        'text',
+        expression,
+        new_column_name='measure_search',
+        debug_column=True,
+        verbose_debug=True,
+    )
+
+    assert result['measure_search'].tolist() == [True, False]
+    assert result['measure_search_matches'].tolist() == [
+        {'nodule~~2MEASURE': (True, [('nodule measures 2 cm', 4, 24)])},
+        {'nodule~~2MEASURE': (False, [])},
+    ]
+    assert result['measure_search_values'].tolist() == [[('2', 'cm')], []]
+    assert result['measure_search_verbose_matches'].tolist() == [
+        ['the nodule measures 2 cm'],
+        [],
     ]

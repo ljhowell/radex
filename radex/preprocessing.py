@@ -10,6 +10,7 @@ from typing import List, Union
 import pandas as pd
 
 from negex.negexPython.negex import negTagger, sortRules
+from radex.radexpressions import split_sentences
 
 RULES_FILE = Path(__file__).parent.parent / "data" / "negex_triggers.txt"
 STOPWORDS_FILE = Path(__file__).parent.parent / "data" / "stopwords.csv"
@@ -77,10 +78,14 @@ def clean_dataframe(
                 with open(RULES_FILE, encoding="utf-8") as rfile:
                     drop_negatives = sortRules(rfile.readlines())
 
+            rules = drop_negatives
+            if not isinstance(rules, list):
+                raise TypeError("drop_negatives must be a list of negation rules")
+
             df_data[col] = df_data[col].apply(
                 lambda x: remove_negated_phrases(
                     x,
-                    rules=drop_negatives,
+                    rules=rules,
                 )
             )
 
@@ -88,10 +93,14 @@ def clean_dataframe(
             if drop_stopwords == "nltk":  # load nltk default stopwords
                 drop_stopwords = pd.read_csv(STOPWORDS_FILE).T.values[0]
 
+            stopwords = drop_stopwords
+            if not isinstance(stopwords, list):
+                raise TypeError("drop_stopwords must be a list of stopwords")
+
             df_data[col] = df_data[col].apply(
                 lambda x: remove_stopwords(
                     x,
-                    stopwords=drop_stopwords,
+                    stopwords=stopwords,
                 )
             )
 
@@ -174,7 +183,7 @@ def remove_negated_phrases(
     #     rules = sortRules(rfile.readlines())
 
     output = ""
-    for sentence in text.split("."):
+    for sentence in split_sentences(text):
         tagger = negTagger(
             sentence=sentence, phrases=[], rules=rules, negP=False
         )
