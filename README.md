@@ -24,7 +24,7 @@ RADEX relies on a user-friendly 'search strategy' which is defined and refined t
 
 ## Clone the repository and install the requirements
 ```bash
-git clone https://github.com/ljhowell/radex
+git clone --recursive -j8 https://github.com/ljhowell/radex
 pip install -r requirements.txt
 ```
 
