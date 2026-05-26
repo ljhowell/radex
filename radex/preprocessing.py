@@ -78,9 +78,7 @@ def clean_dataframe(
                 with open(RULES_FILE, encoding="utf-8") as rfile:
                     drop_negatives = sortRules(rfile.readlines())
 
-            rules = drop_negatives
-            if not isinstance(rules, list):
-                raise TypeError("drop_negatives must be a list of negation rules")
+            rules = list(drop_negatives)
 
             df_data[col] = df_data[col].apply(
                 lambda x: remove_negated_phrases(
@@ -93,9 +91,7 @@ def clean_dataframe(
             if drop_stopwords == "nltk":  # load nltk default stopwords
                 drop_stopwords = pd.read_csv(STOPWORDS_FILE).T.values[0]
 
-            stopwords = drop_stopwords
-            if not isinstance(stopwords, list):
-                raise TypeError("drop_stopwords must be a list of stopwords")
+            stopwords = list(drop_stopwords)
 
             df_data[col] = df_data[col].apply(
                 lambda x: remove_stopwords(
